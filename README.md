@@ -1,7 +1,5 @@
 # STetris32
 My version of the famous game "Tetris" using a system based on the Blue Pill dev board.
-
----
 ## Information
 The sole purpose of this project is to recreate the game mechanics and introduce some other different features regarding in-game audio :). 
 ## Block Diagram
