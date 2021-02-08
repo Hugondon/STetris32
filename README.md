@@ -13,7 +13,7 @@ The system can be summarized in three big modules:
     - Two 8x8 LED Matrices connected to the board via SPI.
     - An OLED Display connected via I2C to show the player's score and the current song being played.
 2. Sound Module.
-    - 12 bit DAC module connected to a speaker to play different game tracks.
+    - 12 bit DAC module connected via I2C that goes directly to a speaker to play different game tracks.
     - SD Card Module to save all tracks.
 3. User Interface Module.
     - 5 buttons with different functionalities.
