@@ -111,9 +111,13 @@ static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 void max_transfer_command(uint8_t address, uint8_t data);
 void max_transfer_data(uint8_t address, uint8_t data, uint8_t data_2);
-void init_matrix(void);
+void max_Init(void);
 
 void shift_matrix_content(void);
+void save_lower_matrix_element(uint8_t i, uint8_t j, uint8_t element);
+void save_upper_matrix_element(uint8_t i, uint8_t j, uint8_t element);
+
+void update_player_score(int points);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -151,12 +155,13 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET);
-  init_matrix();
-  init_matrix();
 
+  // Matrices
+  max_Init();
+  max_Init();
+
+  // LCD
   SSD1306_Init();
-
   SSD1306_Fill(0);
 
   SSD1306_GotoXY(30, 10);
@@ -167,7 +172,7 @@ int main(void)
 
   SSD1306_GotoXY(5, 50);
   sprintf(high_score_user, "HugoCRISTO");
-  sprintf(high_score_str, "%s - %u", high_score_user, high_score);
+  sprintf(high_score_str, "%s - %lu", high_score_user, high_score);
   SSD1306_Puts(high_score_str, &Font_7x10, 1);
 
   SSD1306_DrawLine(5, 70, 140, 70, 1);
@@ -432,15 +437,19 @@ void max_transfer_data(uint8_t address, uint8_t data, uint8_t data_2){
 	HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET);
 }
 
-void init_matrix(void){
+void max_Init(void){
 	max_transfer_command(0x09, 0x00);       									//  Decode Mode 	[NO]
 	max_transfer_command(0x0A, 0x07);       									//  Intensity		[07]
 	max_transfer_command(0x0B, 0x07);       									//  Scan Limit 		[07]
 	max_transfer_command(0x0C, 0x01);       									//  Shutdown		[01] Normal
 	max_transfer_command(0x0F, 0x00);      										//  No Test Display [00]
 }
+
 void save_upper_matrix_element(uint8_t i, uint8_t j, uint8_t element){
 	upper_matrix_buffer[i][j] = element;
+}
+void save_lower_matrix_element(uint8_t i, uint8_t j, uint8_t element){
+	lower_matrix_buffer[i][j] = element;
 }
 void shift_matrix_content(void){
 	// Upper Matrix, Lower Matrix
@@ -450,6 +459,14 @@ void shift_matrix_content(void){
 		max_transfer_data(i, figures_array[0][i-1], figures_array[3][i-1]);
 	}
 
+}
+
+void update_player_score(int points){
+	high_score += points;
+	SSD1306_GotoXY(5, 50);
+	sprintf(high_score_str, "%s - %lu", high_score_user, high_score);
+	SSD1306_Puts(high_score_str, &Font_7x10, 1);
+	SSD1306_UpdateScreen();
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
@@ -470,20 +487,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 	  if(!HAL_GPIO_ReadPin(BTN_UP_GPIO_Port, BTN_UP_Pin)){
 		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
-		  high_score++;
-		  SSD1306_GotoXY(5, 50);
-		  sprintf(high_score_str, "%s - %u", high_score_user, high_score);
-		  SSD1306_Puts(high_score_str, &Font_7x10, 1);
-		  SSD1306_UpdateScreen();
+		  update_player_score(1);
 		  HAL_TIM_Base_Stop(&htim2);
 	  }
 	  if(!HAL_GPIO_ReadPin(BTN_DOWN_GPIO_Port, BTN_DOWN_Pin)){
 		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
-		  high_score--;
-		  SSD1306_GotoXY(5, 50);
-		  sprintf(high_score_str, "%s - %u", high_score_user, high_score);
-		  SSD1306_Puts(high_score_str, &Font_7x10, 1);
-		  SSD1306_UpdateScreen();
+		  update_player_score(-1);
 		  HAL_TIM_Base_Stop(&htim2);
 	  }
 	  if(!HAL_GPIO_ReadPin(BTN_LEFT_GPIO_Port, BTN_LEFT_Pin)){
