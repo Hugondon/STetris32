@@ -96,6 +96,10 @@ uint8_t lower_matrix_buffer[8][8] = {
 {0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},		// Blank
 {0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000}		// Blank
 };
+uint32_t high_score = 120;
+char high_score_user[15];
+char high_score_str[20];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -123,8 +127,6 @@ void shift_matrix_content(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	char high_score_str[20];
-	uint32_t high_score = 120;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -164,7 +166,8 @@ int main(void)
   SSD1306_Puts("High Score", &Font_7x10, 1);
 
   SSD1306_GotoXY(5, 50);
-  sprintf(high_score_str, "MauriCRISTO - %u", high_score);
+  sprintf(high_score_user, "HugoCRISTO");
+  sprintf(high_score_str, "%s - %u", high_score_user, high_score);
   SSD1306_Puts(high_score_str, &Font_7x10, 1);
 
   SSD1306_DrawLine(5, 70, 140, 70, 1);
@@ -182,24 +185,6 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-		  /*
-
-	  	  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
-
-		  high_score++;
-		  SSD1306_GotoXY(5, 50);
-		  sprintf(high_score_str, "MauriCRISTO - %u", high_score);
-		  SSD1306_Puts(high_score_str, &Font_7x10, 1);
-		  SSD1306_UpdateScreen();
-
-		  high_score--;
-		  SSD1306_GotoXY(5, 50);
-		  sprintf(high_score_str, "MauriCRISTO - %u", high_score);
-		  SSD1306_Puts(high_score_str, &Font_7x10, 1);
-		  SSD1306_UpdateScreen();
-			*/
-
-	  HAL_Delay(100);
   }
   /* USER CODE END 3 */
 }
@@ -332,7 +317,7 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 8000-1;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 10-1;
+  htim2.Init.Period = 40-1;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -485,10 +470,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 	  if(!HAL_GPIO_ReadPin(BTN_UP_GPIO_Port, BTN_UP_Pin)){
 		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
+		  high_score++;
+		  SSD1306_GotoXY(5, 50);
+		  sprintf(high_score_str, "%s - %u", high_score_user, high_score);
+		  SSD1306_Puts(high_score_str, &Font_7x10, 1);
+		  SSD1306_UpdateScreen();
 		  HAL_TIM_Base_Stop(&htim2);
 	  }
 	  if(!HAL_GPIO_ReadPin(BTN_DOWN_GPIO_Port, BTN_DOWN_Pin)){
 		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
+		  high_score--;
+		  SSD1306_GotoXY(5, 50);
+		  sprintf(high_score_str, "%s - %u", high_score_user, high_score);
+		  SSD1306_Puts(high_score_str, &Font_7x10, 1);
+		  SSD1306_UpdateScreen();
 		  HAL_TIM_Base_Stop(&htim2);
 	  }
 	  if(!HAL_GPIO_ReadPin(BTN_LEFT_GPIO_Port, BTN_LEFT_Pin)){
