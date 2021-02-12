@@ -61,12 +61,24 @@ void Error_Handler(void);
 #define Test 255
 #define LED_BUILTIN_Pin GPIO_PIN_13
 #define LED_BUILTIN_GPIO_Port GPIOC
+#define BTN_RST_Pin GPIO_PIN_15
+#define BTN_RST_GPIO_Port GPIOC
+#define BTN_RST_EXTI_IRQn EXTI15_10_IRQn
 #define BTN_UP_Pin GPIO_PIN_0
 #define BTN_UP_GPIO_Port GPIOA
+#define BTN_UP_EXTI_IRQn EXTI0_IRQn
 #define BTN_DOWN_Pin GPIO_PIN_1
 #define BTN_DOWN_GPIO_Port GPIOA
+#define BTN_DOWN_EXTI_IRQn EXTI1_IRQn
 #define BTN_LEFT_Pin GPIO_PIN_2
 #define BTN_LEFT_GPIO_Port GPIOA
+#define BTN_LEFT_EXTI_IRQn EXTI2_IRQn
+#define BTN_RIGHT_Pin GPIO_PIN_3
+#define BTN_RIGHT_GPIO_Port GPIOA
+#define BTN_RIGHT_EXTI_IRQn EXTI3_IRQn
+#define BTN_CENTER_Pin GPIO_PIN_4
+#define BTN_CENTER_GPIO_Port GPIOA
+#define BTN_CENTER_EXTI_IRQn EXTI4_IRQn
 #define SPI1_CS_Pin GPIO_PIN_6
 #define SPI1_CS_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */

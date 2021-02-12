@@ -29,6 +29,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
 #include "ssd1306.h"
 #include "fonts.h"
 #include "test.h"
@@ -52,6 +53,8 @@
 I2C_HandleTypeDef hi2c1;
 
 SPI_HandleTypeDef hspi1;
+
+TIM_HandleTypeDef htim2;
 
 /* USER CODE BEGIN PV */
 uint8_t number_array[][8] = {
@@ -100,6 +103,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_I2C1_Init(void);
+static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 void max_transfer_command(uint8_t address, uint8_t data);
 void max_transfer_data(uint8_t address, uint8_t data, uint8_t data_2);
@@ -110,7 +114,6 @@ void shift_matrix_content(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t check;
 /* USER CODE END 0 */
 
 /**
@@ -120,7 +123,8 @@ uint8_t check;
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	_Bool btn_value, btn_value_2, btn_value_3;
+	char high_score_str[20];
+	uint32_t high_score = 120;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -143,6 +147,7 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI1_Init();
   MX_I2C1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET);
   init_matrix();
@@ -151,7 +156,6 @@ int main(void)
   SSD1306_Init();
 
   SSD1306_Fill(0);
-  SSD1306_UpdateScreen();
 
   SSD1306_GotoXY(30, 10);
   SSD1306_Puts("Welcome!", &Font_7x10, 1);
@@ -159,10 +163,14 @@ int main(void)
   SSD1306_GotoXY(30, 30);
   SSD1306_Puts("High Score", &Font_7x10, 1);
 
-  SSD1306_GotoXY(30, 50);
-  SSD1306_Puts("Hugo - 20", &Font_7x10, 1);
-  SSD1306_UpdateScreen();
+  SSD1306_GotoXY(5, 50);
+  sprintf(high_score_str, "MauriCRISTO - %u", high_score);
+  SSD1306_Puts(high_score_str, &Font_7x10, 1);
 
+  SSD1306_DrawLine(5, 70, 140, 70, 1);
+  SSD1306_DrawLine(5, 45, 140, 45, 1);
+  SSD1306_UpdateScreen();
+  shift_matrix_content();
 
   /* USER CODE END 2 */
 
@@ -173,20 +181,24 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  btn_value = HAL_GPIO_ReadPin(BTN_UP_GPIO_Port, BTN_UP_Pin);
 
-	  if(!btn_value){
-		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
-		  shift_matrix_content();
-	  }
-	  btn_value_2 = HAL_GPIO_ReadPin(BTN_DOWN_GPIO_Port, BTN_DOWN_Pin);
-	  if(!btn_value_2){
-		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
-	  }
-	  btn_value_3 = HAL_GPIO_ReadPin(BTN_LEFT_GPIO_Port, BTN_LEFT_Pin);
-	  if(!btn_value_3){
-		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
-	  }
+		  /*
+
+	  	  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
+
+		  high_score++;
+		  SSD1306_GotoXY(5, 50);
+		  sprintf(high_score_str, "MauriCRISTO - %u", high_score);
+		  SSD1306_Puts(high_score_str, &Font_7x10, 1);
+		  SSD1306_UpdateScreen();
+
+		  high_score--;
+		  SSD1306_GotoXY(5, 50);
+		  sprintf(high_score_str, "MauriCRISTO - %u", high_score);
+		  SSD1306_Puts(high_score_str, &Font_7x10, 1);
+		  SSD1306_UpdateScreen();
+			*/
+
 	  HAL_Delay(100);
   }
   /* USER CODE END 3 */
@@ -300,6 +312,51 @@ static void MX_SPI1_Init(void)
 }
 
 /**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 8000-1;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 10-1;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -327,11 +384,23 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_BUILTIN_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : BTN_UP_Pin BTN_DOWN_Pin BTN_LEFT_Pin */
-  GPIO_InitStruct.Pin = BTN_UP_Pin|BTN_DOWN_Pin|BTN_LEFT_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  /*Configure GPIO pin : BTN_RST_Pin */
+  GPIO_InitStruct.Pin = BTN_RST_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(BTN_RST_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : BTN_UP_Pin BTN_DOWN_Pin BTN_LEFT_Pin BTN_CENTER_Pin */
+  GPIO_InitStruct.Pin = BTN_UP_Pin|BTN_DOWN_Pin|BTN_LEFT_Pin|BTN_CENTER_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : BTN_RIGHT_Pin */
+  GPIO_InitStruct.Pin = BTN_RIGHT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(BTN_RIGHT_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : SPI1_CS_Pin */
   GPIO_InitStruct.Pin = SPI1_CS_Pin;
@@ -339,6 +408,25 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(SPI1_CS_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI2_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI3_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI4_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
 
@@ -377,6 +465,50 @@ void shift_matrix_content(void){
 		max_transfer_data(i, figures_array[0][i-1], figures_array[3][i-1]);
 	}
 
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if(GPIO_Pin == BTN_UP_Pin) HAL_TIM_Base_Start_IT(&htim2);
+	if(GPIO_Pin == BTN_DOWN_Pin) HAL_TIM_Base_Start_IT(&htim2);
+	if(GPIO_Pin == BTN_LEFT_Pin) HAL_TIM_Base_Start_IT(&htim2);
+	if(GPIO_Pin == BTN_RIGHT_Pin) HAL_TIM_Base_Start_IT(&htim2);
+	if(GPIO_Pin == BTN_CENTER_Pin) HAL_TIM_Base_Start_IT(&htim2);
+	if(GPIO_Pin == BTN_RST_Pin) HAL_TIM_Base_Start_IT(&htim2);
+
+
+}
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* Prevent unused argument(s) compilation warning */
+  if(htim == &htim2){
+
+	  if(!HAL_GPIO_ReadPin(BTN_UP_GPIO_Port, BTN_UP_Pin)){
+		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
+		  HAL_TIM_Base_Stop(&htim2);
+	  }
+	  if(!HAL_GPIO_ReadPin(BTN_DOWN_GPIO_Port, BTN_DOWN_Pin)){
+		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
+		  HAL_TIM_Base_Stop(&htim2);
+	  }
+	  if(!HAL_GPIO_ReadPin(BTN_LEFT_GPIO_Port, BTN_LEFT_Pin)){
+		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
+		  HAL_TIM_Base_Stop(&htim2);
+	  }
+	  if(!HAL_GPIO_ReadPin(BTN_RIGHT_GPIO_Port, BTN_RIGHT_Pin)){
+		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
+		  HAL_TIM_Base_Stop(&htim2);
+	  }
+	  if(!HAL_GPIO_ReadPin(BTN_CENTER_GPIO_Port, BTN_CENTER_Pin)){
+		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
+		  HAL_TIM_Base_Stop(&htim2);
+	  }
+	  if(!HAL_GPIO_ReadPin(BTN_RST_GPIO_Port, BTN_RST_Pin)){
+		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
+		  HAL_TIM_Base_Stop(&htim2);
+	  }
+
+  }
 }
 /* USER CODE END 4 */
 
