@@ -63,6 +63,10 @@ void Error_Handler(void);
 #define LED_BUILTIN_GPIO_Port GPIOC
 #define BTN_UP_Pin GPIO_PIN_0
 #define BTN_UP_GPIO_Port GPIOA
+#define BTN_DOWN_Pin GPIO_PIN_1
+#define BTN_DOWN_GPIO_Port GPIOA
+#define BTN_LEFT_Pin GPIO_PIN_2
+#define BTN_LEFT_GPIO_Port GPIOA
 #define SPI1_CS_Pin GPIO_PIN_6
 #define SPI1_CS_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
