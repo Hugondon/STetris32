@@ -17,3 +17,6 @@ The system can be summarized in three big modules:
 ## Video
 
 Pending upload.
+
+## Useful Information
+- [I2C Display](https://controllerstech.com/oled-display-using-i2c-stm32/)
