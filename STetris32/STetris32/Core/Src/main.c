@@ -18,7 +18,7 @@
   */
 /* NOTAS
  * 1. Tratar como matriz grande de 16x8?
- *
+ * 2. Enviar matriz lower y matriz upper aprovechando dirección 0?
  *
  *
  *
@@ -37,11 +37,12 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+typedef uint8_t row_t;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -57,44 +58,18 @@ SPI_HandleTypeDef hspi1;
 TIM_HandleTypeDef htim2;
 
 /* USER CODE BEGIN PV */
-uint8_t number_array[][8] = {
-{0b00000000,0b01111110,0b10000001,0b10000001,0b10000001,0b10000001,0b01111110,0b00000000},		// 0
-{0b00000000,0b10000000,0b10000100,0b10000010,0b11111111,0b10000000,0b10000000,0b00000000},		// 1
-{0b00000000,0b10000010,0b11000001,0b10100001,0b10010001,0b10001110,0b00000000,0b00000000},		// 2
-{0b00000000,0b10000001,0b10000001,0b10011001,0b10011001,0b10100101,0b01100110,0b00000000},		// 3
-{0b00010000,0b00011000,0b00010100,0b00010010,0b11111111,0b00010000,0b00010000,0b00000000},		// 4
-{0b00000000,0b10000001,0b10000111,0b10000101,0b10001001,0b11010001,0b01100001,0b00000000},		// 5
-{0b00000000,0b00000000,0b11111100,0b10010010,0b10010001,0b10010001,0b11110000,0b00000000},		// 6
-{0b00000000,0b00000000,0b00000011,0b00000001,0b11110001,0b00001001,0b00000111,0b00000000},		// 7
-{0b00000000,0b11000011,0b10100101,0b10011001,0b10011001,0b10100101,0b11000011,0b00000000},		// 8
-{0b00000000,0b00000000,0b10001111,0b10001001,0b01001001,0b00101001,0b00011111,0b00000000},		// 9
-{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000}		// Blank
+
+row_t test_array[][8] = {
+{0b00010001,0b10101010,0b01000100,0b00000000,0b00000000,0b00100010,0b01010101,0b10001000},
+{0b11011101,0b01010101,0b01110111,0b00000000,0b10111011,0b10101010,0b11101110,0b00000000},
 };
-uint8_t figures_array[][8] = {
-{0b00000000,0b00000000,0b00000000,0b00011000,0b00001100,0b00000000,0b00000000,0b00000000},		// Example
-{0b00000000,0b00000010,0b00000110,0b01100100,0b00110000,0b00000100,0b00000110,0b11110100},		// Example 2
-{0b00000000,0b00000000,0b00011000,0b00011000,0b00000000,0b00000000,0b00000000,0b00000000},
-{0b01100111,0b11000010,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},
+row_t figures_array[][8] = {
+{0b00000000,0b00000000,0b00001000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},
+{0b00000000,0b00000000,0b00001000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},
 };
-uint8_t upper_matrix_buffer[8][8] = {
-{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},		// Blank
-{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},		// Blank
-{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},		// Blank
-{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},		// Blank
-{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},		// Blank
-{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},		// Blank
-{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},		// Blank
-{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000}		// Blank
-};
-uint8_t lower_matrix_buffer[8][8] = {
-{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},		// Blank
-{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},		// Blank
-{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},		// Blank
-{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},		// Blank
-{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},		// Blank
-{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},		// Blank
-{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},		// Blank
-{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000}		// Blank
+row_t matrix_buffer[8][8] = {
+{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},		// Upper
+{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000}		// Lower
 };
 uint32_t high_score = 120;
 char high_score_user[15];
@@ -113,15 +88,16 @@ void max_transfer_command(uint8_t address, uint8_t data);
 void max_transfer_data(uint8_t address, uint8_t data, uint8_t data_2);
 void max_Init(void);
 
-void shift_matrix_content(void);
-void save_lower_matrix_element(uint8_t i, uint8_t j, uint8_t element);
-void save_upper_matrix_element(uint8_t i, uint8_t j, uint8_t element);
+void shift_matrix_content(uint8_t direction);
+void save_matrix_element(uint8_t i, uint8_t j, uint8_t element);
 
 void update_player_score(int points);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+enum matrix_selection{Upper = 0, Lower = 1};
+enum direction{up = 0, down = 1, left = 2, right = 3};
 /* USER CODE END 0 */
 
 /**
@@ -159,6 +135,11 @@ int main(void)
   // Matrices
   max_Init();
   max_Init();
+  for(int i = 1 ; i < 9; i++){
+	matrix_buffer[Upper][i-1] = test_array[0][i-1];
+	matrix_buffer[Lower][i-1] = test_array[1][i-1];
+	max_transfer_data(i, matrix_buffer[Upper][i-1], matrix_buffer[Lower][i-1]);
+  }
 
   // LCD
   SSD1306_Init();
@@ -178,8 +159,6 @@ int main(void)
   SSD1306_DrawLine(5, 70, 140, 70, 1);
   SSD1306_DrawLine(5, 45, 140, 45, 1);
   SSD1306_UpdateScreen();
-  shift_matrix_content();
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -431,9 +410,9 @@ void max_transfer_command(uint8_t address, uint8_t data){
 void max_transfer_data(uint8_t address, uint8_t data, uint8_t data_2){
 	HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_RESET);
 	HAL_SPI_Transmit(&hspi1, &address, 1, 100);
-	HAL_SPI_Transmit(&hspi1, &data, 1, 100);							// Matrix #1
+	HAL_SPI_Transmit(&hspi1, &data, 1, 100);							// Upper
 	HAL_SPI_Transmit(&hspi1, &address, 1, 100);
-	HAL_SPI_Transmit(&hspi1, &data_2, 1, 100);							// Matrix #2
+	HAL_SPI_Transmit(&hspi1, &data_2, 1, 100);							// Lower
 	HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET);
 }
 
@@ -445,18 +424,52 @@ void max_Init(void){
 	max_transfer_command(0x0F, 0x00);      										//  No Test Display [00]
 }
 
-void save_upper_matrix_element(uint8_t i, uint8_t j, uint8_t element){
-	upper_matrix_buffer[i][j] = element;
+void save_matrix_element(uint8_t i, uint8_t j, uint8_t element){
+	// matrix_buffer[i][j] = element;
 }
-void save_lower_matrix_element(uint8_t i, uint8_t j, uint8_t element){
-	lower_matrix_buffer[i][j] = element;
-}
-void shift_matrix_content(void){
-	// Upper Matrix, Lower Matrix
-	for(int i = 1 ; i < 9; i++){
-		upper_matrix_buffer[0][i-1] = figures_array[0][i-1];
-		lower_matrix_buffer[3][i-1] = figures_array[3][i-1];
-		max_transfer_data(i, figures_array[0][i-1], figures_array[3][i-1]);
+
+void shift_matrix_content(uint8_t direction){
+	row_t tmp_row;
+	switch(direction){
+	case up:
+		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
+			for(int i = 1 ; i < 9; i++){
+				matrix_buffer[Upper][i] = figures_array[0][i-1];
+				matrix_buffer[Lower][i] = figures_array[1][i-1];
+				max_transfer_data(i, matrix_buffer[Upper][i], matrix_buffer[Lower][i]);
+			}
+		break;
+	case down:
+		HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
+
+		tmp_row = matrix_buffer[Upper][0];
+
+		for(int i = 1 ; i < 8; i++){
+			matrix_buffer[Upper][i-1] = matrix_buffer[Upper][i];
+			matrix_buffer[Lower][i-1] = matrix_buffer[Lower][i];
+			max_transfer_data(i, matrix_buffer[Upper][i-1], matrix_buffer[Lower][i-1]);
+		}
+		matrix_buffer[Upper][7] = 0b00000000;
+		matrix_buffer[Lower][7] = tmp_row;
+		max_transfer_data(8, matrix_buffer[Upper][7], matrix_buffer[Lower][7]);
+		break;
+	case left:
+		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
+		  for(int i = 1; i < 9; i++){
+			matrix_buffer[Upper][i-1] = matrix_buffer[Upper][i-1] >> 1;
+			matrix_buffer[Lower][i-1] = matrix_buffer[Lower][i-1] >> 1;
+			max_transfer_data(i, matrix_buffer[Upper][i-1], matrix_buffer[Lower][i-1]);
+		  }
+
+		break;
+	case right:
+		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
+		  for(int i = 1; i < 9; i++){
+			matrix_buffer[Upper][i-1] = matrix_buffer[Upper][i-1] << 1;
+			matrix_buffer[Lower][i-1] = matrix_buffer[Lower][i-1] << 1;
+			max_transfer_data(i, matrix_buffer[Upper][i-1], matrix_buffer[Lower][i-1]);
+		  }
+		break;
 	}
 
 }
@@ -486,21 +499,21 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   if(htim == &htim2){
 
 	  if(!HAL_GPIO_ReadPin(BTN_UP_GPIO_Port, BTN_UP_Pin)){
-		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
 		  update_player_score(1);
+		  shift_matrix_content(up);
 		  HAL_TIM_Base_Stop(&htim2);
 	  }
 	  if(!HAL_GPIO_ReadPin(BTN_DOWN_GPIO_Port, BTN_DOWN_Pin)){
-		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
 		  update_player_score(-1);
+		  shift_matrix_content(down);
 		  HAL_TIM_Base_Stop(&htim2);
 	  }
 	  if(!HAL_GPIO_ReadPin(BTN_LEFT_GPIO_Port, BTN_LEFT_Pin)){
-		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
+		  shift_matrix_content(left);
 		  HAL_TIM_Base_Stop(&htim2);
 	  }
 	  if(!HAL_GPIO_ReadPin(BTN_RIGHT_GPIO_Port, BTN_RIGHT_Pin)){
-		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
+		  shift_matrix_content(right);
 		  HAL_TIM_Base_Stop(&htim2);
 	  }
 	  if(!HAL_GPIO_ReadPin(BTN_CENTER_GPIO_Port, BTN_CENTER_Pin)){
