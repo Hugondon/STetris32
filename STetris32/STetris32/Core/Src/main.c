@@ -30,6 +30,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include <stdbool.h>
 #include "ssd1306.h"
 #include "fonts.h"
 #include "test.h"
@@ -60,21 +61,21 @@ TIM_HandleTypeDef htim2;
 /* USER CODE BEGIN PV */
 
 row_t test_array[][8] = {
-{0b00010001,0b10101010,0b01000100,0b00000000,0b00000000,0b00100010,0b01010101,0b10001000},
-{0b11011101,0b01010101,0b01110111,0b00000000,0b10111011,0b10101010,0b11101110,0b00000000},
+{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00011100,0b00001000},
+{0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},
 };
 row_t figures_array[][8] = {
-{0b00000000,0b00000000,0b00001000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},
-{0b00000000,0b00000000,0b00001000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},
+{0b00010001,0b10101010,0b01000100,0b00000000,0b00000000,0b00100010,0b01010101,0b10001000},
+{0b00010001,0b10101010,0b01000100,0b00000000,0b00000000,0b00100010,0b01010101,0b10001000},
 };
 row_t matrix_buffer[8][8] = {
 {0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000},		// Upper
 {0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000,0b00000000}		// Lower
 };
-uint32_t high_score = 120;
+uint32_t high_score = 9990;
 char high_score_user[15];
 char high_score_str[20];
-
+bool center_flag = false;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -89,7 +90,6 @@ void max_transfer_data(uint8_t address, uint8_t data, uint8_t data_2);
 void max_Init(void);
 
 void shift_matrix_content(uint8_t direction);
-void save_matrix_element(uint8_t i, uint8_t j, uint8_t element);
 
 void update_player_score(int points);
 /* USER CODE END PFP */
@@ -97,7 +97,7 @@ void update_player_score(int points);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 enum matrix_selection{Upper = 0, Lower = 1};
-enum direction{up = 0, down = 1, left = 2, right = 3};
+enum direction{up = 0, down = 1, left = 2, right = 3, center = 4, none = 5};
 /* USER CODE END 0 */
 
 /**
@@ -145,20 +145,24 @@ int main(void)
   SSD1306_Init();
   SSD1306_Fill(0);
 
-  SSD1306_GotoXY(30, 10);
-  SSD1306_Puts("Welcome!", &Font_7x10, 1);
-
-  SSD1306_GotoXY(30, 30);
+  SSD1306_GotoXY(20, 0);
+  SSD1306_Puts("Welcome!", &Font_11x18, 1);
+  SSD1306_GotoXY(30, 20);
   SSD1306_Puts("High Score", &Font_7x10, 1);
 
-  SSD1306_GotoXY(5, 50);
+  SSD1306_GotoXY(0, 35);
   sprintf(high_score_user, "HugoCRISTO");
-  sprintf(high_score_str, "%s - %lu", high_score_user, high_score);
+  sprintf(high_score_str, "%s - %05lu", high_score_user, high_score);
   SSD1306_Puts(high_score_str, &Font_7x10, 1);
 
-  SSD1306_DrawLine(5, 70, 140, 70, 1);
-  SSD1306_DrawLine(5, 45, 140, 45, 1);
+  SSD1306_DrawLine(0, 32, 140, 32, 1);
+  SSD1306_DrawLine(0, 45, 140, 45, 1);
+
+  SSD1306_GotoXY(20, 50);
+  SSD1306_Puts("Press Center", &Font_7x10, 1);
+
   SSD1306_UpdateScreen();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -406,7 +410,6 @@ void max_transfer_command(uint8_t address, uint8_t data){
 	HAL_SPI_Transmit(&hspi1, &data, 1, 100);
 	HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET);
 }
-
 void max_transfer_data(uint8_t address, uint8_t data, uint8_t data_2){
 	HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_RESET);
 	HAL_SPI_Transmit(&hspi1, &address, 1, 100);
@@ -415,7 +418,6 @@ void max_transfer_data(uint8_t address, uint8_t data, uint8_t data_2){
 	HAL_SPI_Transmit(&hspi1, &data_2, 1, 100);							// Lower
 	HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET);
 }
-
 void max_Init(void){
 	max_transfer_command(0x09, 0x00);       									//  Decode Mode 	[NO]
 	max_transfer_command(0x0A, 0x07);       									//  Intensity		[07]
@@ -423,20 +425,16 @@ void max_Init(void){
 	max_transfer_command(0x0C, 0x01);       									//  Shutdown		[01] Normal
 	max_transfer_command(0x0F, 0x00);      										//  No Test Display [00]
 }
-
-void save_matrix_element(uint8_t i, uint8_t j, uint8_t element){
-	// matrix_buffer[i][j] = element;
-}
-
 void shift_matrix_content(uint8_t direction){
 	row_t tmp_row;
 	switch(direction){
 	case up:
 		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
+		  // Pending rotations
 			for(int i = 1 ; i < 9; i++){
-				matrix_buffer[Upper][i] = figures_array[0][i-1];
-				matrix_buffer[Lower][i] = figures_array[1][i-1];
-				max_transfer_data(i, matrix_buffer[Upper][i], matrix_buffer[Lower][i]);
+				matrix_buffer[Upper][i-1] = test_array[Upper][i-1];
+				matrix_buffer[Lower][i-1] = test_array[Lower][i-1];
+				max_transfer_data(i, matrix_buffer[Upper][i-1], matrix_buffer[Lower][i-1]);
 			}
 		break;
 	case down:
@@ -473,17 +471,14 @@ void shift_matrix_content(uint8_t direction){
 	}
 
 }
-
 void update_player_score(int points){
 	high_score += points;
-	SSD1306_GotoXY(5, 50);
-	sprintf(high_score_str, "%s - %lu", high_score_user, high_score);
+	SSD1306_GotoXY(0, 35);
+	sprintf(high_score_str, "%s - %05lu", high_score_user, high_score);
 	SSD1306_Puts(high_score_str, &Font_7x10, 1);
 	SSD1306_UpdateScreen();
 }
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin == BTN_UP_Pin) HAL_TIM_Base_Start_IT(&htim2);
 	if(GPIO_Pin == BTN_DOWN_Pin) HAL_TIM_Base_Start_IT(&htim2);
 	if(GPIO_Pin == BTN_LEFT_Pin) HAL_TIM_Base_Start_IT(&htim2);
@@ -493,8 +488,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 
 }
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
   /* Prevent unused argument(s) compilation warning */
   if(htim == &htim2){
 
@@ -518,6 +512,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	  }
 	  if(!HAL_GPIO_ReadPin(BTN_CENTER_GPIO_Port, BTN_CENTER_Pin)){
 		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
+		  center_flag = true;
 		  HAL_TIM_Base_Stop(&htim2);
 	  }
 	  if(!HAL_GPIO_ReadPin(BTN_RST_GPIO_Port, BTN_RST_Pin)){
