@@ -7,16 +7,15 @@ The sole purpose of this project is to recreate the game mechanics and introduce
 
 The system can be summarized in three big modules:
 1. Game Display Module.
-    - Two 8x8 LED Matrices connected to the board via SPI.
-    - An OLED Display connected via I2C to show the player's score and the current song being played.
+    - SPI communication with MAX7219 to control two 8x8 LED matrices.
+    - I2C communication with SSD1306 OLED Driver connected to 128x64 dot display to show the player's score and the current song being played.
 2. Sound Module.
-    - 12 bit DAC module connected via I2C that goes directly to a speaker to play different game tracks.
-    - SD Card Module to save all tracks.
+    - PWM driven 4 ohm speakers.
 3. User Interface Module.
-    - 5 buttons with different functionalities.
+    - 6 buttons with different functionalities.
 ## Video
 
 Pending upload.
 
 ## Useful Information
-- [I2C Display](https://controllerstech.com/oled-display-using-i2c-stm32/)
+- [OLED Display](https://controllerstech.com/oled-display-using-i2c-stm32/)
