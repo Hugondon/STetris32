@@ -43,7 +43,80 @@ typedef uint8_t row_t;
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define NOFNOTES 60
+#define NOFNOTES 	73
+#define NOTE_C1     0
+#define NOTE_CS1    1
+#define NOTE_D1     2
+#define NOTE_DS1    3
+#define NOTE_E1     4
+#define NOTE_F1     5
+#define NOTE_FS1    6
+#define NOTE_G1     7
+#define NOTE_GS1    8
+#define NOTE_A1     9
+#define NOTE_AS1    10
+#define NOTE_B1     11
+#define NOTE_C2     12
+#define NOTE_CS2    13
+#define NOTE_D2     14
+#define NOTE_DS2    15
+#define NOTE_E2     16
+#define NOTE_F2     17
+#define NOTE_FS2    18
+#define NOTE_G2     19
+#define NOTE_GS2    20
+#define NOTE_A2     21
+#define NOTE_AS2    22
+#define NOTE_B2     23
+#define NOTE_C3     24
+#define NOTE_CS3    25
+#define NOTE_D3     26
+#define NOTE_DS3    27
+#define NOTE_E3     28
+#define NOTE_F3     29
+#define NOTE_FS3    30
+#define NOTE_G3     31
+#define NOTE_GS3    32
+#define NOTE_A3     33
+#define NOTE_AS3    34
+#define NOTE_B3     35
+#define NOTE_C4     36
+#define NOTE_CS4    37
+#define NOTE_D4     38
+#define NOTE_DS4    39
+#define NOTE_E4     40
+#define NOTE_F4     41
+#define NOTE_FS4    42
+#define NOTE_G4     43
+#define NOTE_GS4    44
+#define NOTE_A4     45
+#define NOTE_AS4    46
+#define NOTE_B4     47
+#define NOTE_C5     48
+#define NOTE_CS5    49
+#define NOTE_D5     50
+#define NOTE_DS5    51
+#define NOTE_E5     52
+#define NOTE_F5     53
+#define NOTE_FS5    54
+#define NOTE_G5     55
+#define NOTE_GS5    56
+#define NOTE_A5     57
+#define NOTE_AS5    58
+#define NOTE_B5     59
+#define NOTE_C6     60
+#define NOTE_CS6    61
+#define NOTE_D6     62
+#define NOTE_DS6    63
+#define NOTE_E6     64
+#define NOTE_F6     65
+#define NOTE_FS6    66
+#define NOTE_G6     67
+#define NOTE_GS6    68
+#define NOTE_A6     69
+#define NOTE_AS6    70
+#define NOTE_B6     71
+#define NOTE_C7     72
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -58,6 +131,7 @@ SPI_HandleTypeDef hspi1;
 
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
+TIM_HandleTypeDef htim3;
 
 /* USER CODE BEGIN PV */
 
@@ -80,10 +154,76 @@ char high_score_user[15];
 char high_score_str[20];
 
 // Sound Module
-uint16_t psc_array[] = {81, 71, 85, 52, 60, 46, 45, 49, 59, 38, 51, 97, 44, 32, 28, 26, 37, 31, 24, 26, 28, 19, 28, 97, 22, 16, 14, 13, 37, 29, 12, 13, 14, 21, 14, 9, 11, 8, 7, 10, 37, 8, 6, 7, 7, 5, 7, 5, 6};
-uint16_t arr_array[] = {755, 813, 641, 989, 809, 996, 961, 833, 653, 957, 673, 334, 695, 902, 973, 989, 656, 739, 901, 785, 688, 957, 613, 167, 695, 902, 973, 989, 328, 395, 901, 785, 688, 433, 613, 900, 695, 902, 973, 643, 164, 716, 901, 729, 688, 909, 613, 810, 637};
+uint16_t psc_array[] = {424, 403, 291, 211, 266, 232, 285, 289, 212, 195, 197, 137, 149, 136, 114, 193, 108, 113, 100, 84, 101, 81, 112, 137, 65, 68,
+57, 81, 53, 64, 44, 42, 113, 81, 56, 34, 119, 34, 52, 77, 53, 32, 22, 21, 26, 21, 28, 17, 41, 17, 26, 77, 14, 16, 11, 14, 13, 21, 14, 9, 11, 9, 13, 10, 7, 8, 6, 7, 7, 6, 7, 5, 4};
+uint16_t arr_array[] = {577, 573, 749, 975, 730, 790, 607, 565, 727, 746, 697, 946, 821, 849, 956, 533, 899, 811, 865, 972, 763, 898, 613, 473, 941, 849, 956, 635, 916, 716, 983, 972, 341, 449, 613, 953, 257, 849, 524, 334, 458, 716, 983, 972, 741, 866, 613, 953, 373, 849, 524, 167, 867, 716, 983, 729, 741, 433, 613, 900, 695, 802, 524, 643, 867, 716, 901, 729, 688, 758, 613, 810, 956};
 uint8_t array_index = 0;
 
+//notes in the melody:
+int melody[] = {
+  NOTE_E5, NOTE_E3, NOTE_B4, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_D5, NOTE_C5,
+  NOTE_B4, NOTE_A4, NOTE_A3, NOTE_A4, NOTE_C5, NOTE_E5, NOTE_A3, NOTE_D5,
+  NOTE_C5, NOTE_B4, NOTE_E4, NOTE_G4, NOTE_C5, NOTE_D5, NOTE_E3, NOTE_E5,
+  NOTE_E3, NOTE_C5, NOTE_A3, NOTE_A4, NOTE_A3, NOTE_A4, NOTE_A3, NOTE_B2,
+  NOTE_C3, NOTE_D3, NOTE_D5, NOTE_F5, NOTE_A5, NOTE_C5, NOTE_C5, NOTE_G5,
+  NOTE_F5, NOTE_E5, NOTE_C3, 0, NOTE_C5, NOTE_E5, NOTE_A4, NOTE_G4, NOTE_D5,
+  NOTE_C5, NOTE_B4, NOTE_E4, NOTE_B4, NOTE_C5, NOTE_D5, NOTE_G4, NOTE_E5,
+  NOTE_G4, NOTE_C5, NOTE_E4, NOTE_A4, NOTE_E3, NOTE_A4, 0,
+  NOTE_E5, NOTE_E3, NOTE_B4, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_D5, NOTE_C5,
+  NOTE_B4, NOTE_A4, NOTE_A3, NOTE_A4, NOTE_C5, NOTE_E5, NOTE_A3, NOTE_D5,
+  NOTE_C5, NOTE_B4, NOTE_E4, NOTE_G4, NOTE_C5, NOTE_D5, NOTE_E3, NOTE_E5,
+  NOTE_E3, NOTE_C5, NOTE_A3, NOTE_A4, NOTE_A3, NOTE_A4, NOTE_A3, NOTE_B2,
+  NOTE_C3, NOTE_D3, NOTE_D5, NOTE_F5, NOTE_A5, NOTE_C5, NOTE_C5, NOTE_G5,
+  NOTE_F5, NOTE_E5, NOTE_C3, 0, NOTE_C5, NOTE_E5, NOTE_A4, NOTE_G4, NOTE_D5,
+  NOTE_C5, NOTE_B4, NOTE_E4, NOTE_B4, NOTE_C5, NOTE_D5, NOTE_G4, NOTE_E5,
+  NOTE_G4, NOTE_C5, NOTE_E4, NOTE_A4, NOTE_E3, NOTE_A4, 0,
+  NOTE_E4, NOTE_E3, NOTE_A2, NOTE_E3, NOTE_C4, NOTE_E3, NOTE_A2, NOTE_E3,
+  NOTE_D4, NOTE_E3, NOTE_GS2, NOTE_E3, NOTE_B3, NOTE_E3, NOTE_GS2, NOTE_E3,
+  NOTE_C4, NOTE_E3, NOTE_A2, NOTE_E3, NOTE_A3, NOTE_E3, NOTE_A2, NOTE_E3,
+  NOTE_GS3, NOTE_E3, NOTE_GS2, NOTE_E3, NOTE_B3, NOTE_E3, NOTE_GS2, NOTE_E3,
+  NOTE_E4, NOTE_E3, NOTE_A2, NOTE_E3, NOTE_C4, NOTE_E3, NOTE_A2, NOTE_E3,
+  NOTE_D4, NOTE_E3, NOTE_GS2, NOTE_E3, NOTE_B3, NOTE_E3, NOTE_GS2, NOTE_E3,
+  NOTE_C4, NOTE_E3, NOTE_E4, NOTE_E3, NOTE_A4, NOTE_E3, NOTE_A2, NOTE_E3,
+  NOTE_GS4, NOTE_E3, NOTE_GS2, NOTE_E3, NOTE_GS2, NOTE_E3, NOTE_GS2, NOTE_E3,
+  NOTE_E5, NOTE_E3, NOTE_B4, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_D5, NOTE_C5,
+  NOTE_B4, NOTE_A4, NOTE_A3, NOTE_A4, NOTE_C5, NOTE_E5, NOTE_A3, NOTE_D5,
+  NOTE_C5, NOTE_B4, NOTE_E4, NOTE_G4, NOTE_C5, NOTE_D5, NOTE_E3, NOTE_E5,
+  NOTE_E3, NOTE_C5, NOTE_A3, NOTE_A4, NOTE_A3, NOTE_A4, NOTE_A3, NOTE_B2,
+  NOTE_C3, NOTE_D3, NOTE_D5, NOTE_F5, NOTE_A5, NOTE_C5, NOTE_C5, NOTE_G5,
+  NOTE_F5, NOTE_E5, NOTE_C3, 0, NOTE_C5, NOTE_E5, NOTE_A4, NOTE_G4, NOTE_D5,
+  NOTE_C5, NOTE_B4, NOTE_E4, NOTE_B4, NOTE_C5, NOTE_D5, NOTE_G4, NOTE_E5,
+  NOTE_G4, NOTE_C5, NOTE_E4, NOTE_A4, NOTE_E3, NOTE_A4, 0,
+  NOTE_E5, NOTE_E3, NOTE_B4, NOTE_C5, NOTE_D5, NOTE_E5, NOTE_D5, NOTE_C5,
+  NOTE_B4, NOTE_A4, NOTE_A3, NOTE_A4, NOTE_C5, NOTE_E5, NOTE_A3, NOTE_D5,
+  NOTE_C5, NOTE_B4, NOTE_E4, NOTE_G4, NOTE_C5, NOTE_D5, NOTE_E3, NOTE_E5,
+  NOTE_E3, NOTE_C5, NOTE_A3, NOTE_A4, NOTE_A3, NOTE_A4, NOTE_A3, NOTE_B2,
+  NOTE_C3, NOTE_D3, NOTE_D5, NOTE_F5, NOTE_A5, NOTE_C5, NOTE_C5, NOTE_G5,
+  NOTE_F5, NOTE_E5, NOTE_C3, 0, NOTE_C5, NOTE_E5, NOTE_A4, NOTE_G4, NOTE_D5,
+  NOTE_C5, NOTE_B4, NOTE_E4, NOTE_B4, NOTE_C5, NOTE_D5, NOTE_G4, NOTE_E5,
+  NOTE_G4, NOTE_C5, NOTE_E4, NOTE_A4, NOTE_E3, NOTE_A4, 0,
+  NOTE_E4, NOTE_E3, NOTE_A2, NOTE_E3, NOTE_C4, NOTE_E3, NOTE_A2, NOTE_E3,
+  NOTE_D4, NOTE_E3, NOTE_GS2, NOTE_E3, NOTE_B3, NOTE_E3, NOTE_GS2, NOTE_E3,
+  NOTE_C4, NOTE_E3, NOTE_A2, NOTE_E3, NOTE_A3, NOTE_E3, NOTE_A2, NOTE_E3,
+  NOTE_GS3, NOTE_E3, NOTE_GS2, NOTE_E3, NOTE_B3, NOTE_E3, NOTE_GS2, NOTE_E3,
+  NOTE_E4, NOTE_E3, NOTE_A2, NOTE_E3, NOTE_C4, NOTE_E3, NOTE_A2, NOTE_E3,
+  NOTE_D4, NOTE_E3, NOTE_GS2, NOTE_E3, NOTE_B3, NOTE_E3, NOTE_GS2, NOTE_E3,
+  NOTE_C4, NOTE_E3, NOTE_E4, NOTE_E3, NOTE_A4, NOTE_E3, NOTE_A2, NOTE_E3,
+  NOTE_GS4, NOTE_E3, NOTE_GS2, NOTE_E3, NOTE_GS2, NOTE_E3, NOTE_GS2, NOTE_E3,
+};
+int noteDurations[] = {
+  8,8,8,8,8,16,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
+  8,4,8,8,16,16,8,8,8,8,8,8,8,16,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,4,4,
+  8,8,8,8,8,16,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
+  8,4,8,8,16,16,8,8,8,8,8,8,8,16,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,4,4,
+  8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
+  8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
+  8,8,8,8,8,16,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
+  8,4,8,8,16,16,8,8,8,8,8,8,8,16,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,4,4,
+  8,8,8,8,8,16,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
+  8,4,8,8,16,16,8,8,8,8,8,8,8,16,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,4,4,
+  8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
+  8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
+};
 // General Purpose
 bool center_flag = false;
 
@@ -96,6 +236,7 @@ static void MX_SPI1_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM1_Init(void);
+static void MX_TIM3_Init(void);
 /* USER CODE BEGIN PFP */
 void max_transfer_command(uint8_t address, uint8_t data);
 void max_transfer_data(uint8_t address, uint8_t data, uint8_t data_2);
@@ -104,6 +245,8 @@ void max_Init(void);
 void shift_matrix_content(uint8_t direction);
 
 void update_player_score(int points);
+
+void custom_tone(uint32_t channel, uint8_t tone, uint8_t duration);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -143,6 +286,7 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM2_Init();
   MX_TIM1_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
   // Matrices
@@ -176,6 +320,7 @@ int main(void)
 
   SSD1306_UpdateScreen();
 
+  int i = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -185,7 +330,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
+	  custom_tone(TIM_CHANNEL_1, melody[i], noteDurations[i]);
+	  i = (i < sizeof(melody)/sizeof(int) ? i + 1 : 0);
   }
   /* USER CODE END 3 */
 }
@@ -414,6 +560,51 @@ static void MX_TIM2_Init(void)
 }
 
 /**
+  * @brief TIM3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM3_Init(void)
+{
+
+  /* USER CODE BEGIN TIM3_Init 0 */
+
+  /* USER CODE END TIM3_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM3_Init 1 */
+
+  /* USER CODE END TIM3_Init 1 */
+  htim3.Instance = TIM3;
+  htim3.Init.Prescaler = 1000-1;
+  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim3.Init.Period = 1000-1;
+  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM3_Init 2 */
+
+  /* USER CODE END TIM3_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -562,6 +753,22 @@ void update_player_score(int points){
 	SSD1306_Puts(high_score_str, &Font_7x10, 1);
 	SSD1306_UpdateScreen();
 }
+
+void custom_tone(uint32_t channel, uint8_t tone, uint8_t duration){
+	  htim1.Init.Prescaler = psc_array[tone]-1;
+	  htim1.Init.Period = arr_array[tone]-1;
+	  HAL_TIM_Base_Init(&htim1);
+	  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+	  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+
+	  htim3.Init.Prescaler = (1000*1.3)-1;
+	  htim3.Init.Period = (1000/duration)-1;
+	  HAL_Delay(200);
+	  HAL_TIM_Base_Start_IT(&htim3);
+
+}
+
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin == BTN_UP_Pin) HAL_TIM_Base_Start_IT(&htim2);
 	if(GPIO_Pin == BTN_DOWN_Pin) HAL_TIM_Base_Start_IT(&htim2);
@@ -599,25 +806,17 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	  if(!HAL_GPIO_ReadPin(BTN_CENTER_GPIO_Port, BTN_CENTER_Pin)){
 		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
 		  center_flag = true;
-		  htim1.Init.Prescaler = psc_array[array_index]-1;
-		  htim1.Init.Period = arr_array[array_index]-1;
-		  array_index = (array_index < NOFNOTES - 1 ? array_index + 1 : 0);
-		  HAL_TIM_Base_Init(&htim1);
-		  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-		  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
+
 		  HAL_TIM_Base_Stop(&htim2);
 	  }
 	  if(!HAL_GPIO_ReadPin(BTN_RST_GPIO_Port, BTN_RST_Pin)){
 		  HAL_GPIO_TogglePin(LED_BUILTIN_GPIO_Port, LED_BUILTIN_Pin);
-		  htim1.Init.Prescaler = psc_array[array_index]-1;
-		  htim1.Init.Period = arr_array[array_index]-1;
-		  array_index = (array_index < NOFNOTES - 1 ? array_index + 1 : 0);
-		  HAL_TIM_Base_Init(&htim1);
-		  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
-		  HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
 		  HAL_TIM_Base_Stop(&htim2);
 	  }
 
+  }
+  if(htim == &htim3){
+	  	  HAL_TIM_Base_Stop(&htim3);
   }
 }
 /* USER CODE END 4 */
