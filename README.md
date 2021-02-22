@@ -10,9 +10,9 @@ The system can be summarized in three big modules:
     - SPI communication with MAX7219 to control two 8x8 LED matrices.
     - I2C communication with SSD1306 OLED Driver connected to 128x64 dot display to show the player's score and the current song being played.
 2. Sound Module.
-    - PWM driven 4 ohm speakers.
+    - PWM + NPN BJT circuit driven 4 ohm speakers.
 3. User Interface Module.
-    - 6 buttons with different functionalities.
+    - 6 buttons with different functionalities (up/down/left/right/center/reset).
 ## Video
 
 Pending upload.
