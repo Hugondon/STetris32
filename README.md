@@ -19,3 +19,4 @@ Pending upload.
 
 ## Useful Information
 - [OLED Display](https://controllerstech.com/oled-display-using-i2c-stm32/)
+- [Matrices](https://acoptex.com/project/160/basics-project-032a-8x8-dot-led-matrix-64-led-digital-display-common-anode-and-common-cathode-at-lex-c/)
