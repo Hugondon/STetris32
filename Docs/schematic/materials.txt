@@ -1,0 +1,26 @@
+// Board
+1. 1 x Bluepill					(2 x Conn_01x20_Female)	X
+
+// User Interface
+2. 6 x push-buttons				(SW_PUSH_12mm)		?
+
+// Game Display Module
+-- Matrices --
+3. 2 x MAX7219					(DIP-24)		X
+4. 4 x Conn_01x08_Female 			(matrices)		X
+5. 2 x 10 uF Electrolytic Capacitor 		(4.7 uF 0603)		?
+6. 2 x 0.1 uF Ceramic Capacitor			(0603)			X
+7. 2 x 10K Resistance 				(0603)			X
+-- OLED --
+8. 2 x 10K Resistance				(0603)			X
+9. 1 x Conn_01x04_Female						X
+
+// Sound Module
+9.  2 x BJT 2N2222A Transistors 		(TO - 92)		X
+10. 2 x 330 Resistance (1/4 W)			(270 0603)		X
+11. 2 x 68 Resistance (1/4 W)			(220 0603)		X
+12. 2 x Conn_01x02_Female 			(Speakers)		X
+
+// Power Module
+12. 9V Battery					(BatteryHolder_MPD_BA9VPC_1xPP3)     ? 
+13. 7805 regulator				(TO - 220)		X

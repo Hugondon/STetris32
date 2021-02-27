@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name Footprints)(type KiCad)(uri C:/Users/hugon/Documents/VS_Code/STetris32/docs/schematic/Kicad-STM32/Footprints)(options "")(descr ""))
+  (lib (name akn_misc)(type KiCad)(uri C:/Users/hugon/Documents/VS_Code/STetris32/docs/schematic/akn_misc.pretty)(options "")(descr ""))
+)

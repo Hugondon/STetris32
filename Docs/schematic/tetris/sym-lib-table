@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name akn_misc)(type Legacy)(uri C:/Users/hugon/Documents/VS_Code/STetris32/docs/schematic/akn-kicad-libs/akn_misc.lib)(options "")(descr ""))
+  (lib (name YAAJ_BluePill)(type Legacy)(uri C:/Users/hugon/Documents/VS_Code/STetris32/docs/schematic/Kicad-STM32/Symbols/YAAJ_BluePill.lib)(options "")(descr ""))
+)
